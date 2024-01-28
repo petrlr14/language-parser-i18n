@@ -87,7 +87,7 @@ const readFile = (f: File, cb: (str: string) => void) => {
   };
 };
 
-const createJsonObject = (key: string, json: any, prev: string = "") => {
+const createJsonObject = (json: { [k: string]: any }, prev: string = "") => {
   if (Array.isArray(json) || typeof json === "string") {
     return prev;
   }
@@ -95,27 +95,29 @@ const createJsonObject = (key: string, json: any, prev: string = "") => {
     const keys = Object.keys(json);
     const results = [];
     for (let i = 0; i < keys.length; i++) {
-      results.push(
-        createJsonObject(keys[i], json[keys[i]], `${prev}/${keys[i]}`),
-      );
+      results.push(createJsonObject(json[keys[i]], `${prev}/${keys[i]}`));
     }
-    const parsedResults: string[] = results.reduce((prev, current) => {
-      if (typeof current === "string") {
-        return [...prev, current];
-      }
-      if (Array.isArray(current)) return [...prev, ...current];
-      return [...prev];
-    }, [] as string[]);
+    const parsedResults: string[] = results.reduce(
+      (prev: string[], current) => {
+        if (typeof current === "string") {
+          return [...prev, current];
+        }
+        if (Array.isArray(current)) return [...prev, ...current];
+        return [...prev];
+      },
+      [] as string[],
+    );
     return parsedResults;
   }
 };
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 const getJsonObject = (json: any) => {
   const jsonKeys = Object.keys(json);
-  const keys = [];
+  const keys: string[] = [];
   for (let i = 0; i < jsonKeys.length; i++) {
-    const x = createJsonObject(jsonKeys[i], json[jsonKeys[i]], jsonKeys[i]);
-    keys.push(...x);
+    const x = createJsonObject(json[jsonKeys[i]], jsonKeys[i]);
+    keys.push(...(x as string[]));
   }
   return keys;
 };

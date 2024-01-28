@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface Props {
   setFiles: (files: File[]) => void;
@@ -17,6 +17,13 @@ const SelectFiles = ({ setFiles }: Props) => {
     setFiles(files);
   };
 
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.setAttribute("directory", "");
+      ref.current.setAttribute("webkitdirectory", "true");
+    }
+  }, [ref]);
+
   return (
     <>
       <button
@@ -32,8 +39,6 @@ const SelectFiles = ({ setFiles }: Props) => {
         type="file"
         className="hidden"
         ref={ref}
-        directory=""
-        webkitdirectory="true"
         multiple
         onChange={onChange}
       />
